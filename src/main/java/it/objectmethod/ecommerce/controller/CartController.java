@@ -38,10 +38,13 @@ public class CartController {
 		Optional<Articolo> optArt = artRep.findById(idArticolo);
 		boolean t = true;
 
-		if (qta < 1) {
-			resp = new ResponseEntity<Cart>(HttpStatus.BAD_REQUEST);
-			return resp;
-		}
+		/*
+		 * if (qta < 1) { resp = new ResponseEntity<Cart>(HttpStatus.BAD_REQUEST);
+		 * return resp; }
+		 */
+		// Ora permettiamo l'inserimento di un numero negativo (solamente se il prodotto
+		// è gia
+		// in carrello e voglio rimuoverne una quantità
 
 		if (optArt.isPresent()) {
 
@@ -64,22 +67,48 @@ public class CartController {
 
 			CartDetail dettaglio = new CartDetail();
 			dettaglio.setArticolo(art);
-			if (t) {
+			if (t) { // entra in questo if solamente se non è un carrello nuovo
 
-				for (int i = 0; i < carrello.getListaSpesa().size(); i++) {
+				for (int i = 0; i < carrello.getListaSpesa().size(); i++) { // ciclo tutta la lista della spesa per
+																			// vedere
+					// se l'articolo che l'utente sta provando a inserire è già presente o meno
 
 					if (art == carrello.getListaSpesa().get(i).getArticolo()) {
-						carrello.getListaSpesa().get(i)
-								.setQuantita(qta + carrello.getListaSpesa().get(i).getQuantita());
-						carrello = carRep.save(carrello);
-						resp = new ResponseEntity<Cart>(carrello, HttpStatus.OK);
-						return resp;
-					} else {
+						if (qta + carrello.getListaSpesa().get(i).getQuantita() < 0) {
+							resp = new ResponseEntity<Cart>(HttpStatus.BAD_REQUEST);
+							return resp; // in questo caso qta è per forza negativo, cioè l'utente sta provando a
+											// rimuovere
+							// articoli. Se il suo modulo è > della quantità che
+							// c'è nel carrello, allora restituisce errore
+						} else {
+							if (qta + carrello.getListaSpesa().get(i).getQuantita() == 0) {
+								// in questo caso l'utente vuole rimuovere tutti gli elementi
+								// di quel determinato articolo, perciò rimuoviamo l'intera riga ordine
+								carrello.getListaSpesa().remove(i);
+								art.setDisponibilità(art.getDisponibilità() - qta);
+								art = artRep.save(art);
+								resp = new ResponseEntity<Cart>(carrello, HttpStatus.OK);
+								return resp;
+							} else { // cioè se vuole rimuovere prodotti ma non tutti
+								carrello.getListaSpesa().get(i)
+										.setQuantita(qta + carrello.getListaSpesa().get(i).getQuantita());
+								carrello = carRep.save(carrello);
+								art.setDisponibilità(art.getDisponibilità() - qta); // aggiorno la disponibilità nel db
+								art = artRep.save(art);
+								resp = new ResponseEntity<Cart>(carrello, HttpStatus.OK);
+								return resp;
+							}
+						}
+					} else { // se l'articolo non è già presente
 						dettaglio.setQuantita(qta);
+						art.setDisponibilità(art.getDisponibilità() - qta);
+						art = artRep.save(art);
 					}
 				}
-			} else {
+			} else { // se non è un carrello nuovo
 				dettaglio.setQuantita(qta);
+				art.setDisponibilità(art.getDisponibilità() - qta);
+				art = artRep.save(art);
 			}
 
 			List<CartDetail> lista = carrello.getListaSpesa();
