@@ -22,7 +22,7 @@ public class CartDetail {
 
 	@JsonIgnore
 	@ManyToOne(cascade = CascadeType.ALL)
-	@JoinColumn (name="id_carrello")
+	@JoinColumn(name = "id_carrello")
 	private Cart carrello;
 
 	@Column(name = "quantita")

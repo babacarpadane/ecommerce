@@ -43,7 +43,7 @@ public class Cart {
 	public void setUser(Utente user) {
 		this.user = user;
 	}
-	
+
 	public List<CartDetail> getListaSpesa() {
 		return listaSpesa;
 	}

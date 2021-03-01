@@ -27,18 +27,17 @@ import it.objectmethod.ecommerce.repository.RigaOrdineRepository;
 public class OrdineController {
 	@Autowired
 	private CartRepository carRep;
-	
+
 	@Autowired
 	private OrdineRepository ordRep;
-	
+
 	@Autowired
 	private RigaOrdineRepository rigRep;
 
 	@PostMapping("/crea-ordine")
 	public ResponseEntity<Ordine> stampaOrdine(@RequestParam("id_utente") Long idUtente) {
-		
 		ResponseEntity<Ordine> resp = null;
-		
+
 		// Creazone codice alfanumerico di 5 caratteri
 		String code = null;
 		List<String> codeList = new ArrayList<String>();
@@ -53,14 +52,14 @@ public class OrdineController {
 			codice.append((char) (rand.nextInt(9) + 48));
 			code = codice.toString();
 		} while (codeList.contains(code)); // Se è già presente nella lista, ricicla e ne crea uno nuovo
-		
+
 		Cart carrello = carRep.findByUserIdUtente(idUtente);
 		Ordine ordine = new Ordine();
 		ordine.setNumeroOrdine(code);
 		ordine.setUtenteOrdine(carrello.getUser());
-		Date data = Date.valueOf(getLocalDate());
+		Date data = Date.valueOf(getLocalDate()); // Prende la data odierna
 		ordine.setDataOrdine(data);
-			
+
 		List<CartDetail> listaSpesa = carrello.getListaSpesa();
 		List<RigaOrdine> listaRighe = new ArrayList<RigaOrdine>();
 		RigaOrdine riga = null;
@@ -78,8 +77,8 @@ public class OrdineController {
 		resp = new ResponseEntity<Ordine>(ordine, HttpStatus.OK);
 		return resp;
 	}
-	
+
 	public static LocalDate getLocalDate() {
-	    return LocalDate.now();
+		return LocalDate.now();
 	}
 }

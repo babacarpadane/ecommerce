@@ -19,18 +19,18 @@ public class RigaOrdine {
 	@Id
 	@Column(name = "id_riga_ordine")
 	private Long idRigaOrdine;
-	
+
 	@JsonIgnore
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "id_ordine")
 	private Ordine ordine;
-	
+
 	@JsonIgnore
 	@OneToOne
 	@JoinColumn(name = "id_articolo")
 	private Articolo articolo;
-	
-	@Column(name="quantita")
+
+	@Column(name = "quantita")
 	private Integer quantita;
 
 	public Long getIdRigaOrdine() {
@@ -63,6 +63,6 @@ public class RigaOrdine {
 
 	public void setQuantita(Integer quantita) {
 		this.quantita = quantita;
-	}	
-	
+	}
+
 }
