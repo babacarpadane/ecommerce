@@ -38,14 +38,6 @@ public class CartController {
 		Optional<Articolo> optArt = artRep.findById(idArticolo);
 		boolean t = true;
 
-		/*
-		 * if (qta < 1) { resp = new ResponseEntity<Cart>(HttpStatus.BAD_REQUEST);
-		 * return resp; }
-		 */
-		// Ora permettiamo l'inserimento di un numero negativo (solamente se il prodotto
-		// è gia
-		// in carrello e voglio rimuoverne una quantità
-
 		if (optArt.isPresent()) {
 
 			Articolo art = optArt.get();
@@ -76,9 +68,9 @@ public class CartController {
 					if (art == carrello.getListaSpesa().get(i).getArticolo()) {
 						if (qta + carrello.getListaSpesa().get(i).getQuantita() < 0) {
 							resp = new ResponseEntity<Cart>(HttpStatus.BAD_REQUEST);
-							return resp; // in questo caso qta è per forza negativo, cioè l'utente sta provando a
+							return resp; // in questo caso qta è negativo, cioè l'utente sta provando a
 											// rimuovere
-							// articoli. Se il suo modulo è > della quantità che
+							// articoli. Se il modulo di qta è > della quantità che
 							// c'è nel carrello, allora restituisce errore
 						} else {
 							if (qta + carrello.getListaSpesa().get(i).getQuantita() == 0) {
